@@ -1,0 +1,9 @@
+[Unit]
+Description=Update Firefox Theme
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecCondition=/bin/bash -c '! flatpak ps | grep -q org.mozilla.firefox'
+ExecStart=/bin/firefox-theme-update.sh

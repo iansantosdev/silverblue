@@ -1,0 +1,9 @@
+[Unit]
+Description=Update Arkenfox user.js
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecCondition=/bin/bash -c '! flatpak ps | grep -q org.mozilla.firefox'
+ExecStart=/bin/firefox-userjs-update.sh

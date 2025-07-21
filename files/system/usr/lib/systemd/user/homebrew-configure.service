@@ -1,0 +1,12 @@
+[Unit]
+Description=Configure Homebrew
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/bash -c 'while [ ! -f /etc/.linuxbrew ]; do sleep 1; done'
+ExecStart=/bin/homebrew-configure.sh
+
+[Install]
+WantedBy=default.target

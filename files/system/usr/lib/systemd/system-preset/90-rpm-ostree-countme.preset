@@ -1,0 +1,2 @@
+disable rpm-ostree-countme.service
+disable rpm-ostree-countme.timer

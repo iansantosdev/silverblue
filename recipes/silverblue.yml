@@ -1,0 +1,154 @@
+---
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+name: silverblue
+description: Fedora Atomic
+
+base-image: quay.io/fedora-ostree-desktops/silverblue
+image-version: 42
+
+modules:
+  - type: files
+    files:
+      - source: system
+        destination: /
+
+  - type: bling
+    install:
+      - rpmfusion
+      - dconf-update-service
+
+  - type: rpm-ostree
+    # repos:
+    # - https://pkgs.tailscale.com/stable/fedora/tailscale.repo
+    # - https://copr.fedorainfracloud.org/coprs/ublue-os/packages/repo/fedora-%OS_VERSION%/ublue-os-packages-fedora-%OS_VERSION%.repo
+    install:
+      - android-tools
+      - ddcutil
+      - gcc
+      - ffmpeg
+      - ffmpeg-libs
+      - ffmpegthumbnailer
+      - heif-pixbuf-loader
+      - intel-media-driver
+      - libheif-freeworld
+      - libheif-tools
+      - mesa-va-drivers-freeworld.x86_64
+      - opendoas
+      - tailscale
+      - https://github.com/trapexit/mergerfs/releases/download/2.40.2/mergerfs-2.40.2-1.fc42.x86_64.rpm
+      # - ublue-os-update-services
+    remove:
+      - fedora-bookmarks
+      - fedora-chromium-config
+      - fedora-chromium-config-gnome
+      - fedora-flathub-remote
+      - fedora-repos-archive
+      - fedora-third-party
+      - fedora-workstation-repositories
+      - ffmpeg-free
+      - firefox
+      - firefox-langpacks
+      - gnome-classic-session
+      - gnome-shell-extension-apps-menu
+      - gnome-shell-extension-background-logo
+      - gnome-shell-extension-common
+      - gnome-shell-extension-launch-new-instance
+      - gnome-shell-extension-places-menu
+      - gnome-shell-extension-window-list
+      - gnome-software-rpm-ostree
+      - gnome-system-monitor
+      - gnome-tour
+      - libavcodec-free
+      - libavdevice-free
+      - libavfilter-free
+      - libavformat-free
+      - libavutil-free
+      - libpostproc-free
+      - libswresample-free
+      - libswscale-free
+      - mesa-va-drivers
+      - yelp
+
+  - type: brew
+    auto-update: true
+    auto-upgrade: true
+    brew-analytics: false
+
+  - type: default-flatpaks
+    notify: true
+    user:
+      repo-url: https://dl.flathub.org/repo/flathub.flatpakrepo
+      repo-name: flathub
+      install:
+        - app.drey.Damask
+        - com.bitwarden.desktop
+        - com.github.tchx84.Flatseal
+        - com.mattjakeman.ExtensionManager
+        - com.spotify.Client
+        - io.bassi.Amberol
+        - io.mpv.Mpv
+        - md.obsidian.Obsidian
+        - net.nokyan.Resources
+        - org.gnome.Calculator
+        - org.gnome.Calendar
+        - org.gnome.clocks
+        - org.gnome.Contacts
+        - org.gnome.Loupe
+        - org.gnome.NautilusPreviewer
+        - org.gnome.Papers
+        - org.gnome.Snapshot
+        - org.gnome.TextEditor
+        - org.gnome.Weather
+        - org.localsend.localsend_app
+        - org.mozilla.firefox
+        - org.mozilla.Thunderbird
+        - org.qbittorrent.qBittorrent
+        - org.signal.Signal
+
+  - type: fonts
+    fonts:
+      nerd-fonts:
+        - JetBrainsMono
+
+  - type: systemd
+    system:
+      enabled:
+        - autologin.service
+        - rpm-ostreed-automatic.timer
+        - tailscaled.service
+      masked:
+        - rpm-ostree-countme.service
+        - rpm-ostree-countme.timer
+    user:
+      enabled:
+        - homebrew-configure.service
+        - firefox-theme-update.timer
+        - firefox-userjs-update.timer
+        - flatpak-user-update.timer
+        - flatpak-install-runtimes.service
+        - podman-auto-update.timer
+        - podman.socket
+        - ptyxis-reset-settings.service
+
+  - type: gschema-overrides
+
+  # - type: justfiles
+  #   validate: true
+  #   include: []
+
+  - type: gnome-extensions
+    source: local
+    install:
+      - Alphabetical App Grid
+      - Clipboard History
+      - Hot Edge
+      - Just Perfection
+      - spotify-tray
+      - Weather O'Clock
+
+  - type: script
+    scripts:
+      - set-file-permissions.sh
+      - fix-extension-version.sh
+
+  - type: signing

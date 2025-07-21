@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily update for Arkenfox user.js
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+
+[Install]
+WantedBy=timers.target
