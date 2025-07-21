@@ -1,0 +1,10 @@
+[Unit]
+Description=Reset Ptyxis settings
+ConditionPathExists=!%h/.config/ptyxis-reset-settings-done
+
+[Service]
+Type=oneshot
+ExecStart=/bin/ptyxis-reset-settings.sh
+
+[Install]
+WantedBy=default.target

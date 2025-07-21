@@ -1,0 +1,10 @@
+[Unit]
+Description=Enable autologin
+ConditionPathExists=!/etc/autologin-done
+
+[Service]
+Type=oneshot
+ExecStart=/bin/autologin.sh
+
+[Install]
+WantedBy=default.target

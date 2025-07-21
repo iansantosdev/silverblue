@@ -1,0 +1,26 @@
+[org.gnome.Ptyxis]
+audible-bell=false
+default-columns=212
+default-profile-uuid='1cb3e3a31951e9cbf7bba7b065e78e55'
+default-rows=48
+font-name='JetBrainsMono Nerd Font 10'
+new-tab-position='next'
+profile-uuids=['1cb3e3a31951e9cbf7bba7b065e78e55']
+restore-window-size=false
+use-system-font=false
+
+[org.gnome.Ptyxis.Shortcuts]
+close-other-tabs='<ctrl><shift>w'
+close-tab='<ctrl>w'
+copy-clipboard='<ctrl>c'
+detach-tab='<ctrl><shift>n'
+move-next-tab='<ctrl>Tab'
+move-previous-tab='<ctrl><shift>Tab'
+move-tab-left='<shift>Left'
+move-tab-right='<shift>Right'
+new-tab='<ctrl>t'
+new-window='<ctrl>n'
+paste-clipboard='<ctrl>v'
+search='<ctrl>f'
+tab-overview='<ctrl>o'
+undo-close-tab='<ctrl><shift>t'

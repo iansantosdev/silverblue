@@ -1,0 +1,12 @@
+[Unit]
+Description=Install Flatpak Runtimes
+ConditionPathExists=!%h/.config/flatpak-install-runtimes-done
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/flatpak-install-runtimes.sh
+
+[Install]
+WantedBy=default.target

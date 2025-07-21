@@ -1,0 +1,42 @@
+[org/gnome/settings-daemon/plugins/media-keys]
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom8/']
+
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1]
+binding='<Super>i'
+command='flatpak run org.mozilla.firefox -P ian'
+name='Firefox ian profile'
+
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2]
+binding='<Alt><Super>i'
+command='flatpak run org.mozilla.firefox -P ian --private-window'
+name='Firefox ian profile private'
+
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3]
+binding='<Super>d'
+command='flatpak run org.mozilla.firefox -P dev'
+name='Firefox dev profile'
+
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4]
+binding='<Alt><Super>d'
+command='flatpak run org.mozilla.firefox -P dev --private-window'
+name='Firefox dev profile private'
+
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5]
+binding='<Super>1'
+command='nautilus -w'
+name='Nautilus'
+
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6]
+binding='<Super>t'
+command='/bin/ptyxis --tab'
+name='Ptyxis'
+
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7]
+binding='<Super>g'
+command='fish -c "if ddcutil get 60 | grep -q 0x11; ddcutil set 60 0x0f; else; ddcutil set 60 0x11; end"'
+name='Toggle Input Source'
+
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom8]
+binding='<Control><Shift>Escape'
+command="flatpak run net.nokyan.Resources"
+name='Resources'

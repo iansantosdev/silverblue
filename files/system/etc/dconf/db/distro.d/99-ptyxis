@@ -1,0 +1,5 @@
+[org/gnome/Ptyxis/Profiles/1cb3e3a31951e9cbf7bba7b065e78e55]
+bold-is-bright=true
+custom-command='fish'
+label='Fedora'
+use-custom-command=true
