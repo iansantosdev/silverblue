@@ -35,6 +35,7 @@ modules:
       - mesa-va-drivers-freeworld.x86_64
       - opendoas
       - tailscale
+      - zstd
       - https://github.com/trapexit/mergerfs/releases/download/2.40.2/mergerfs-2.40.2-1.fc42.x86_64.rpm
       # - ublue-os-update-services
     remove:
