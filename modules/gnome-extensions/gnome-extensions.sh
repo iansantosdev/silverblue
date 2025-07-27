@@ -209,6 +209,6 @@ if [[ ${#UNINSTALL[@]} -gt 0 ]]; then
   done
 fi
 
-# Compile gschema to include schemas from extensions  & to refresh schema state after uninstall is done
+# Compile gschema to include schemas from extensions & to refresh schema state after uninstall is done
 echo "Compiling gschema to include extension schemas & to refresh the schema state"
 glib-compile-schemas "/usr/share/glib-2.0/schemas/" &>/dev/null
