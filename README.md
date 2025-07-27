@@ -1,4 +1,4 @@
-# A Custom Fedora Silverblue Image &nbsp; [![build badge](https://github.com/iansantosdev/silverblue/actions/workflows/build.yml/badge.svg)](https://github.com/iansantosdev/silverblue/actions/workflows/build.yml)
+# A Custom Fedora Silverblue Image &nbsp; [![build badge](https://github.com/iansantosdev/silverblue/actions/workflows/release.yml/badge.svg)](https://github.com/iansantosdev/silverblue/actions/workflows/release.yml)
 
 This repository provides a custom OCI image built from Fedora Silverblue. It is designed to offer a tailored desktop experience with a focus on a minimal base system, sane defaults, and the latest open-source technologies.
 
