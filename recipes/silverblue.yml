@@ -76,35 +76,32 @@ modules:
     brew-analytics: false
 
   - type: default-flatpaks
-    notify: true
-    user:
-      repo-url: https://dl.flathub.org/repo/flathub.flatpakrepo
-      repo-name: flathub
-      install:
-        - app.drey.Damask
-        - com.bitwarden.desktop
-        - com.github.tchx84.Flatseal
-        - com.mattjakeman.ExtensionManager
-        - com.spotify.Client
-        - io.bassi.Amberol
-        - io.mpv.Mpv
-        - md.obsidian.Obsidian
-        - net.nokyan.Resources
-        - org.gnome.Calculator
-        - org.gnome.Calendar
-        - org.gnome.clocks
-        - org.gnome.Contacts
-        - org.gnome.Loupe
-        - org.gnome.NautilusPreviewer
-        - org.gnome.Papers
-        - org.gnome.Snapshot
-        - org.gnome.TextEditor
-        - org.gnome.Weather
-        - org.localsend.localsend_app
-        - org.mozilla.firefox
-        - org.mozilla.Thunderbird
-        - org.qbittorrent.qBittorrent
-        - org.signal.Signal
+    configurations:
+      - install:
+          - app.drey.Damask
+          - com.bitwarden.desktop
+          - com.github.tchx84.Flatseal
+          - com.mattjakeman.ExtensionManager
+          - com.spotify.Client
+          - io.bassi.Amberol
+          - io.mpv.Mpv
+          - md.obsidian.Obsidian
+          - net.nokyan.Resources
+          - org.gnome.Calculator
+          - org.gnome.Calendar
+          - org.gnome.clocks
+          - org.gnome.Contacts
+          - org.gnome.Loupe
+          - org.gnome.NautilusPreviewer
+          - org.gnome.Papers
+          - org.gnome.Snapshot
+          - org.gnome.TextEditor
+          - org.gnome.Weather
+          - org.localsend.localsend_app
+          - org.mozilla.firefox
+          - org.mozilla.Thunderbird
+          - org.qbittorrent.qBittorrent
+          - org.signal.Signal
 
   - type: fonts
     fonts:
