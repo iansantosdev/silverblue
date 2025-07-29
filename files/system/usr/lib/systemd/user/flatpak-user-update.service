@@ -1,8 +1,8 @@
 [Unit]
 Description=Flatpak Automatic Update
 Documentation=man:flatpak(1)
-Wants=network-online.target
-After=network-online.target
+Wants=podman-user-wait-network-online.service
+After=podman-user-wait-network-online.service
 
 [Service]
 Type=oneshot

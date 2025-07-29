@@ -1,6 +1,6 @@
 [Unit]
 Description=Reset Ptyxis settings
-ConditionPathExists=!%h/.config/ptyxis-reset-settings-done
+ConditionPathExists=!%E/ptyxis-reset-settings-done
 
 [Service]
 Type=oneshot
