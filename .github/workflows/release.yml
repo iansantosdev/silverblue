@@ -2,7 +2,7 @@ name: Build and Publish Custom Image
 
 on:
   schedule:
-    - cron: "00 02 * * *" # Runs every day at 2 AM UTC
+    - cron: "00 03 * * *" # Runs every day at 3 AM UTC
   push:
     paths-ignore:
       - "**.md"
