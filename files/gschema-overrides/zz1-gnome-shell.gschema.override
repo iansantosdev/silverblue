@@ -61,6 +61,7 @@ sleep-inactive-ac-type='nothing'
 
 [org.gnome.shell]
 development-tools=false
+disable-user-extensions=false
 enabled-extensions=['AlphabeticalAppGrid@stuarthayhurst', 'clipboard-history@alexsaveau.dev', 'hotedge@jonathan.jdoda.ca', 'just-perfection-desktop@just-perfection', 'sp-tray@sp-tray.esenliyim.github.com', 'weatheroclock@CleoMenezesJr.github.io']
 favorite-apps=['org.gnome.Nautilus.desktop', 'org.gnome.Ptyxis.desktop', 'org.mozilla.firefox.desktop', 'md.obsidian.Obsidian.desktop', 'org.gnome.TextEditor.desktop', 'org.signal.Signal.desktop', 'org.mozilla.Thunderbird.desktop', 'com.spotify.Client.desktop', 'com.vscodium.codium.desktop', 'com.github.marhkb.Pods.desktop', 'com.bitwarden.desktop.desktop', 'com.github.iwalton3.jellyfin-media-player.desktop', 'com.heroicgameslauncher.hgl.desktop', 'com.valvesoftware.Steam.desktop', 'org.gnome.Software.desktop', 'net.nokyan.Resources.desktop']
 last-selected-power-profile='performance'
