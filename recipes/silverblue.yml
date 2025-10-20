@@ -20,7 +20,6 @@ modules:
   - type: rpm-ostree
     repos:
       - https://pkgs.tailscale.com/stable/fedora/tailscale.repo
-    # - https://copr.fedorainfracloud.org/coprs/ublue-os/packages/repo/fedora-%OS_VERSION%/ublue-os-packages-fedora-%OS_VERSION%.repo
     install:
       - android-tools
       - ddcutil
@@ -37,7 +36,6 @@ modules:
       - tailscale
       - zstd
       - https://github.com/trapexit/mergerfs/releases/download/2.40.2/mergerfs-2.40.2-1.fc42.x86_64.rpm
-      # - ublue-os-update-services
     remove:
       - fedora-bookmarks
       - fedora-chromium-config
@@ -78,7 +76,7 @@ modules:
   - type: default-flatpaks
     configurations:
       - notify: false
-      - install:
+        install:
           - app.drey.Damask
           - com.bitwarden.desktop
           - com.github.tchx84.Flatseal
@@ -130,10 +128,6 @@ modules:
         - ptyxis-reset-settings.service
 
   - type: gschema-overrides
-
-  # - type: justfiles
-  #   validate: true
-  #   include: []
 
   - type: gnome-extensions
     source: local
