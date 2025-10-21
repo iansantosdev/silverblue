@@ -54,6 +54,9 @@ show-create-link=true
 [org.gnome.nautilus.window-state]
 maximized=true
 
+[org.gnome.settings-daemon.plugins.housekeeping]
+donation-reminder-enabled=false
+
 [org.gnome.settings-daemon.plugins.power]
 power-button-action='nothing'
 sleep-inactive-ac-timeout=3600
@@ -66,7 +69,7 @@ enabled-extensions=['AlphabeticalAppGrid@stuarthayhurst', 'clipboard-history@ale
 favorite-apps=['org.gnome.Nautilus.desktop', 'org.gnome.Ptyxis.desktop', 'org.mozilla.firefox.desktop', 'md.obsidian.Obsidian.desktop', 'org.gnome.TextEditor.desktop', 'org.signal.Signal.desktop', 'org.mozilla.Thunderbird.desktop', 'com.spotify.Client.desktop', 'com.vscodium.codium.desktop', 'dev.zed.Zed.desktop', 'com.github.marhkb.Pods.desktop', 'com.bitwarden.desktop.desktop', 'com.heroicgameslauncher.hgl.desktop', 'com.valvesoftware.Steam.desktop', 'org.gnome.Software.desktop', 'net.nokyan.Resources.desktop']
 last-selected-power-profile='performance'
 remember-mount-password=true
-welcome-dialog-last-shown-version='48.0'
+welcome-dialog-last-shown-version='49.0'
 
 [org.gnome.shell.app-switcher]
 current-workspace-only=true
