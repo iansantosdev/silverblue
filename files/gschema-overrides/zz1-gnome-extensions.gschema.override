@@ -5,6 +5,7 @@ strip-text=true
 
 [org.gnome.shell.extensions.hotedge]
 fallback-in-use=false
+show-animation=false
 
 [org.gnome.shell.extensions.just-perfection]
 dash-icon-size=48
