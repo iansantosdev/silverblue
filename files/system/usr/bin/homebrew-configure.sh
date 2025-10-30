@@ -18,6 +18,7 @@ brew update --force --quiet
 packages=(
   "autorestic"
   "bat"
+  "chezmoi"
   "cosign"
   "eza"
   "fd"
@@ -30,6 +31,8 @@ packages=(
   "restic"
   "ripgrep"
   "sd"
+  "sevenzip"
+  "smartmontools"
   "sshfs"
   "vim"
   "yt-dlp"

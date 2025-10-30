@@ -5,6 +5,8 @@ description: Fedora Atomic
 
 base-image: quay.io/fedora-ostree-desktops/silverblue
 image-version: 43
+alt-tags:
+  - testing
 
 modules:
   - type: files
@@ -99,6 +101,7 @@ modules:
           - org.mozilla.Thunderbird
           - org.qbittorrent.qBittorrent
           - org.signal.Signal
+          - org.gtk.Gtk3theme.Adwaita-dark
 
   - type: fonts
     fonts:
@@ -120,7 +123,6 @@ modules:
         - firefox-theme-update.timer
         - firefox-userjs-update.timer
         - flatpak-user-update.timer
-        - flatpak-install-runtimes.service
         - podman-auto-update.timer
         - podman.socket
         - ptyxis-reset-settings.service
