@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+
+name: silverblue-lts
+description: Fedora Atomic
+
+base-image: quay.io/fedora-ostree-desktops/silverblue
+image-version: 42
+
+modules:
+  - from-file: recipe.yml
+
+  - type: gschema-overrides
+    include:
+      - zz1-gnome-extensions.gschema.override
+      - zz1-gnome-keybindings.gschema.override
+      - zz1-gnome-shell-lts.gschema.override
+      - zz1-ptyxis.gschema.override
