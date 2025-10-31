@@ -4,9 +4,13 @@ on:
   schedule:
     - cron: "00 03 * * *" # Runs every day at 3 AM UTC
   push:
+    branches:
+      - testing
     paths-ignore:
       - "**.md"
   pull_request:
+    branches:
+      - testing
   workflow_dispatch:
 
 concurrency:
