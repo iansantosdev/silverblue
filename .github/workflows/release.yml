@@ -1,8 +1,8 @@
-name: Build and Publish Custom Image
+name: Build Custom Image
 
 on:
   schedule:
-    - cron: "00 03 * * *" # Runs every day at 3 AM UTC
+    - cron: "00 03 * * *"
   push:
     branches:
       - testing
@@ -18,25 +18,18 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  release:
-    name: Build and Release
+  silverblue:
+    name: silverblue
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
       id-token: write
-
-    strategy:
-      fail-fast: false
-      matrix:
-        recipe:
-          - silverblue.yml
-
     steps:
-      - name: Build Custom Image
+      - name: Build Silverblue
         uses: blue-build/github-action@v1
         with:
-          recipe: ${{ matrix.recipe }}
+          recipe: silverblue.yml
           cosign_private_key: ${{ secrets.SIGNING_SECRET }}
           registry_token: ${{ github.token }}
           pr_event_number: ${{ github.event.number }}
