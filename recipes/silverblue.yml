@@ -88,6 +88,7 @@ modules:
           - org.mozilla.Thunderbird
           - org.qbittorrent.qBittorrent
           - org.signal.Signal
+          - org.gtk.Gtk3theme.Adwaita-dark
 
   - type: gnome-extensions
     source: local
@@ -121,7 +122,6 @@ modules:
         - firefox-theme-update.timer
         - firefox-userjs-update.timer
         - flatpak-user-update.timer
-        - flatpak-install-runtimes.service
         - podman-auto-update.timer
         - podman.socket
         - ptyxis-reset-settings.service
