@@ -18,6 +18,7 @@ brew update --force --quiet
 packages=(
   "autorestic"
   "bat"
+  "chezmoi"
   "cosign"
   "eza"
   "fd"
@@ -30,6 +31,8 @@ packages=(
   "restic"
   "ripgrep"
   "sd"
+  "sevenzip"
+  "smartmontools"
   "sshfs"
   "vim"
   "yt-dlp"
@@ -48,7 +51,6 @@ if [ ${#packages_to_install[@]} -gt 0 ]; then
   echo "Installing Homebrew packages: ${packages_to_install[*]}..."
   notify-send --app-name="Homebrew" "Default Packages" "Installing..."
   brew install --quiet "${packages_to_install[@]}"
-  brew doctor
   notify-send --app-name="Homebrew" "Default Packages" "Finished installing"
 else
   echo "All required Homebrew packages are already installed."
