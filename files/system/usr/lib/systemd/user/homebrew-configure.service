@@ -7,6 +7,8 @@ After=podman-user-wait-network-online.service
 Type=oneshot
 ExecStartPre=/bin/bash -c 'while [ ! -f /etc/.linuxbrew ]; do sleep 1; done'
 ExecStart=/bin/homebrew-configure.sh
+Restart=on-failure
+RestartSec=30s
 
 [Install]
-WantedBy=default.target
+WantedBy=graphical-session.target
