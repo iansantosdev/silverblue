@@ -1,21 +1,11 @@
----
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
+
 name: silverblue
 description: Fedora Atomic
-
 base-image: quay.io/fedora-ostree-desktops/silverblue
 image-version: 43
 
 modules:
-  - type: files
-    files:
-      - source: system
-        destination: /
-
-  - type: bling
-    install:
-      - dconf-update-service
-
   - type: dnf
     repos:
       nonfree: rpmfusion
@@ -28,7 +18,6 @@ modules:
         - ddcutil
         - ffmpegthumbnailer
         - gcc
-        - heif-pixbuf-loader
         - intel-media-driver
         - libheif-freeworld
         - opendoas
@@ -100,10 +89,22 @@ modules:
           - org.qbittorrent.qBittorrent
           - org.signal.Signal
 
-  - type: fonts
-    fonts:
-      nerd-fonts:
-        - JetBrainsMono
+  - type: gnome-extensions
+    source: local
+    install:
+      - Alphabetical App Grid
+      - Clipboard History
+      - Hot Edge
+      - Just Perfection
+      - spotify-tray
+      - Weather O'Clock
+
+  - type: gschema-overrides
+
+  - type: files
+    files:
+      - source: system
+        destination: /
 
   - type: systemd
     system:
@@ -125,17 +126,14 @@ modules:
         - podman.socket
         - ptyxis-reset-settings.service
 
-  - type: gschema-overrides
-
-  - type: gnome-extensions
-    source: local
+  - type: bling
     install:
-      - Alphabetical App Grid
-      - Clipboard History
-      - Hot Edge
-      - Just Perfection
-      - spotify-tray
-      - Weather O'Clock
+      - dconf-update-service
+
+  - type: fonts
+    fonts:
+      nerd-fonts:
+        - JetBrainsMono
 
   - type: script
     scripts:
