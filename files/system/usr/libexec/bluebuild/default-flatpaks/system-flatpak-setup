@@ -1,0 +1,76 @@
+#!/usr/libexec/bluebuild/nu/nu
+
+const usrSharePath = "/usr/share/bluebuild/default-flatpaks"
+const configPath = $"($usrSharePath)/configuration.yaml"
+
+def main [] {
+    let configFile = open $configPath
+
+    let keepFedora = $configFile | where scope == system | any {|config|
+        $config.repo.url == "oci+https://registry.fedoraproject.org"
+    }
+
+    let systemRemotes = (flatpak remotes --system --columns name | split row "\n")
+    if (not $keepFedora and ($systemRemotes | any {|remote| $remote == "fedora" or $remote == "fedora-testing"})) {
+        if ('/usr/bin/gnome-software' | path exists) {
+            try { pkill gnome-software }
+        }
+        if ('/usr/lib/fedora-third-party/fedora-third-party-opt-out' | path exists) {
+            /usr/lib/fedora-third-party/fedora-third-party-opt-out
+        }
+        if ('/usr/bin/fedora-third-party' | path exists) {
+            /usr/bin/fedora-third-party disable
+        }
+
+        if ($systemRemotes | any {|remote| $remote == "fedora"}) {
+            flatpak remote-delete --system fedora --force
+        }
+        if ($systemRemotes | any {|remote| $remote == "fedora-testing"}) {
+            flatpak remote-delete --system fedora-testing --force
+        }
+        let fedoraAppList = (flatpak list --system --app --columns=origin,application | detect columns --no-headers | default [] | where column0 == fedora)
+        if ($fedoraAppList | is-not-empty) {
+            let fedoraApps = $fedoraAppList | get column1
+            flatpak remove --system --noninteractive ...$fedoraApps
+        }
+
+        let fedoraRuntimeList = (flatpak list --system --runtime --columns=origin,application,arch,branch | detect columns --no-headers | default [] | where column0 == fedora)
+        if ($fedoraRuntimeList | is-not-empty) {
+            let fedoraRuntimes = $fedoraRuntimeList | each {|i| $"($i.column1)/($i.column2)/($i.column3)" }
+            flatpak remove --system --noninteractive ...$fedoraRuntimes
+        }
+    }
+
+    for config in ($configFile | where scope == system) {
+        flatpak remote-add --system --if-not-exists $config.repo.name $config.repo.url --title $config.repo.title
+        flatpak remote-modify --system --enable $config.repo.name
+
+        if ($config.notify) {
+            (notify-send-as-user
+                "--app-name" "Automatic Flatpak Installation Service"
+                $"Starting automated installation of ($config.install | length) system Flatpak\(s) from ($config.repo.title)..."
+            )
+        }
+
+        flatpak install --system --noninteractive $config.repo.name ...$config.install
+
+        if ($config.notify) {
+            (notify-send-as-user
+                "--app-name" "Automatic Flatpak Installation Service"
+                $"Finished automated installation of ($config.install | length) system Flatpak\(s) from ($config.repo.title)!"
+                ($config.install | str join ', ')
+            )
+        }
+    }
+}
+
+def notify-send-as-user [...args] {
+    # this works most of the time, sometimes not
+    # let's not let notification errors interrupt the rest of the module's function
+    do --ignore-errors {
+        let user_name = (loginctl list-sessions --json=short | from json | get user | get 0)
+        let uid = (loginctl list-sessions --json=short | from json | get uid | get 0)
+        let xdg_runtime_path = $"/run/user/($uid)"
+        sudo -u $user_name DBUS_SESSION_BUS_ADDRESS=unix:path=($xdg_runtime_path)/bus notify-send ...$args
+    }
+}
