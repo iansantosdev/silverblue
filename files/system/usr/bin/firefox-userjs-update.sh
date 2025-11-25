@@ -16,7 +16,7 @@ find "$FIREFOX_DIR" -maxdepth 1 -type d -exec test -f "{}/user-overrides.js" \; 
       if [ -f "$profile/updater.sh" ]; then
         "$profile/updater.sh" -bsu >/dev/null 2>&1
       fi
-      if [ -f "$profile/prefsCleaner.sh" ]; then
+      if [ -f "$profile/prefsCleaner.sh" ] && [ -f "$profile/prefs.js" ]; then
         "$profile/prefsCleaner.sh" -s >/dev/null 2>&1
       fi
   done
