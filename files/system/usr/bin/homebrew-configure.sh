@@ -16,6 +16,7 @@ brew analytics off
 brew update --force --quiet
 
 packages=(
+  "age"
   "autorestic"
   "bat"
   "chezmoi"
