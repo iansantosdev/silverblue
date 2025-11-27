@@ -141,4 +141,7 @@ modules:
       - set-file-permissions.sh
       - fix-extension-version.sh
 
+  - type: chezmoi
+    repository: git@github.com:iansantosdev/dotfiles.git
+
   - type: signing
