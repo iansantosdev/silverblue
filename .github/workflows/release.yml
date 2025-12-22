@@ -2,7 +2,7 @@ name: Build Custom Image
 
 on:
   schedule:
-    - cron: "00 03 * * *"
+    - cron: "00 01 * * *"
   push:
     branches:
       - testing
