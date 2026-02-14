@@ -23,7 +23,7 @@ modules:
         - libheif-freeworld
         - opendoas
         - tailscale
-        - https://github.com/trapexit/mergerfs/releases/download/2.40.2/mergerfs-2.40.2-1.fc42.x86_64.rpm
+        - https://github.com/trapexit/mergerfs/releases/download/2.41.1/mergerfs-2.41.1-1.fc43.x86_64.rpm
     remove:
       packages:
         - fedora-bookmarks
