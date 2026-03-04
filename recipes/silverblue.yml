@@ -140,6 +140,7 @@ modules:
     scripts:
       - set-file-permissions.sh
       - fix-extension-version.sh
+      - remove-brew-completions.sh
 
   - type: chezmoi
     repository: git@github.com:iansantosdev/dotfiles.git
