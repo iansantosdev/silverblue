@@ -11,6 +11,7 @@ modules:
       nonfree: rpmfusion
       files:
         - https://pkgs.tailscale.com/stable/fedora/tailscale.repo
+      cleanup: true
     install:
       install-weak-deps: false
       packages:
