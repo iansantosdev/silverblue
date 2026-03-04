@@ -16,7 +16,6 @@ modules:
       packages:
         - android-tools
         - ddcutil
-        - duperemove
         - ffmpegthumbnailer
         - gcc
         - intel-media-driver
