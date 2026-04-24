@@ -25,7 +25,7 @@ remove-old-trash-files=true
 
 [org.gnome.desktop.search-providers]
 disabled=['org.gnome.Nautilus.desktop']
-enabled=['hu.kramo.Cartridges.desktop']
+enabled=['']
 
 [org.gnome.desktop.session]
 idle-delay=0
