@@ -3,7 +3,7 @@
 name: silverblue
 description: Fedora Atomic
 base-image: quay.io/fedora-ostree-desktops/silverblue
-image-version: 43
+image-version: 44
 
 modules:
   - type: dnf
@@ -21,6 +21,7 @@ modules:
         - gcc
         - intel-media-driver
         - libheif-freeworld
+        - mesa-va-drivers-freeworld
         - opendoas
         - tailscale
         - https://github.com/trapexit/mergerfs/releases/download/2.41.1/mergerfs-2.41.1-1.fc43.x86_64.rpm
@@ -53,8 +54,6 @@ modules:
         packages:
           - new: ffmpeg
             old: ffmpeg-free
-          - new: mesa-va-drivers-freeworld
-            old: mesa-va-drivers
 
   - type: brew
     auto-update: true
