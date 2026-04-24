@@ -153,7 +153,7 @@ if [[ ${#INSTALL[@]} -gt 0 ]]; then
       # So that's why I made a check for directory
       # I made an additional check if language files are available, in case if extension is packaged with an empty folder, like with Default Workspace extension
       if [[ -d "${TMP_DIR}/locale/" ]]; then
-        if find "${TMP_DIR}/locale/" -type f -name "*.mo" -print -quit | read; then
+        if find "${TMP_DIR}/locale/" -type f -name "*.mo" -print -quit | read -r; then
           echo "Installing language extension files"
           install -d -m 0755 "/usr/share/locale/"
           cp -r "${TMP_DIR}/locale"/* "/usr/share/locale/"
