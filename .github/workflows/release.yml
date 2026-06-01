@@ -1,8 +1,6 @@
 name: Build Custom Image
 
 on:
-  schedule:
-    - cron: "00 01 * * *"
   push:
     branches:
       - testing
@@ -11,6 +9,9 @@ on:
   pull_request:
     branches:
       - testing
+  repository_dispatch:
+    types:
+      - build-image
   workflow_dispatch:
 
 concurrency:
