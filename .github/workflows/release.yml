@@ -19,9 +19,45 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  validate:
+    name: validate
+    runs-on: ubuntu-latest
+    container: fedora:44
+    permissions:
+      contents: read
+    steps:
+      - name: Install validation dependencies
+        run: |
+          dnf install -y dconf flatpak git glib2 podman shellcheck systemd
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install BlueBuild
+        run: |
+          cleanup() {
+            podman --storage-driver=vfs rm -f blue-build-installer >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+          podman --storage-driver=vfs create \
+            --pull=always \
+            --name blue-build-installer \
+            ghcr.io/blue-build/cli:latest-installer
+          podman --storage-driver=vfs cp \
+            blue-build-installer:/out/bluebuild \
+            /usr/local/bin/bluebuild
+          bluebuild --version
+
+      - name: Validate repository
+        run: ./scripts/validate.sh
+
+      - name: Validate Flatpak references
+        run: ./scripts/validate-flatpaks.sh
+
   silverblue:
     name: silverblue
     runs-on: ubuntu-latest
+    needs: validate
     permissions:
       contents: read
       packages: write
