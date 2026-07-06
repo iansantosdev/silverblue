@@ -120,7 +120,7 @@ install_schemas() {
   shopt -s nullglob
   schema_files=("${source_dir}/schemas/"*.gschema.xml)
   shopt -u nullglob
-  (( ${#schema_files[@]} > 0 )) || return
+  (( ${#schema_files[@]} > 0 )) || return 0
 
   echo "Installing extension schemas"
   case "$EXT_UUID" in
@@ -141,9 +141,9 @@ install_locales() {
   local source_dir="$1"
   local locale_file
 
-  [[ -d "${source_dir}/locale" ]] || return
+  [[ -d "${source_dir}/locale" ]] || return 0
   locale_file="$(find "${source_dir}/locale" -type f -name '*.mo' -print -quit)"
-  [[ -n "$locale_file" ]] || return
+  [[ -n "$locale_file" ]] || return 0
 
   echo "Installing extension locales"
   install -d -m 0755 "$LOCALES_DIR"
