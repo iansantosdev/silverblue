@@ -1,214 +1,227 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -oue pipefail
+set -euo pipefail
+
+readonly EXTENSIONS_URL="https://extensions.gnome.org"
+readonly EXTENSIONS_DIR="/usr/share/gnome-shell/extensions"
+readonly SCHEMAS_DIR="/usr/share/glib-2.0/schemas"
+readonly LOCALES_DIR="/usr/share/locale"
+readonly -a CURL_ARGS=(
+  --fail
+  --silent
+  --show-error
+  --location
+  --retry 3
+  --connect-timeout 30
+  --max-time 300
+)
+
+die() {
+  echo "ERROR: $*" >&2
+  exit 1
+}
+
+fetch() {
+  curl "${CURL_ARGS[@]}" "$@"
+}
 
 get_json_array INSTALL 'try .["install"][]' "$1"
 get_json_array UNINSTALL 'try .["uninstall"][]' "$1"
 
-if [[ ${#INSTALL[@]} -lt 1 ]] && [[ ${#UNINSTALL[@]} -lt 1 ]]; then
-  echo "ERROR: You did not specify the extension to install or uninstall in module recipe file"
-  exit 1
+if (( ${#INSTALL[@]} == 0 && ${#UNINSTALL[@]} == 0 )); then
+  die "No extensions were specified to install or uninstall"
 fi
 
-if ! command -v gnome-shell &> /dev/null; then
-  echo "ERROR: Your custom image is using non-Gnome desktop environment, where Gnome extensions are not supported"
-  exit 1
+command -v gnome-shell >/dev/null 2>&1 \
+  || die "GNOME Shell is not installed; GNOME extensions are not supported"
+
+gnome_version_output="$(gnome-shell --version)"
+if [[ ! "$gnome_version_output" =~ ([0-9]+) ]]; then
+  die "Could not determine the GNOME Shell version from: ${gnome_version_output}"
 fi
+readonly GNOME_VERSION="${BASH_REMATCH[1]}"
 
-echo "Testing connection with https://extensions.gnome.org/..."
-if ! curl --output /dev/null --silent --head --fail "https://extensions.gnome.org/"; then
-  echo "ERROR: Connection unsuccessful."
-  echo "       This usually happens when https://extensions.gnome.org/ website is down."
-  echo "       Please try again later (or disable the module temporarily)"
-  exit 1
-else
-  echo "Connection successful, proceeding."
-fi
+TMP_DIR="$(mktemp -d)"
+readonly TMP_DIR
+trap 'rm -rf "$TMP_DIR"' EXIT
 
-GNOME_VER=$(gnome-shell --version | sed 's/[^0-9]*\([0-9]*\).*/\1/')
-echo "Gnome version: ${GNOME_VER}"
+echo "GNOME version: ${GNOME_VERSION}"
 
-# Populates global vars: EXT_UUID, EXT_NAME, and EXT_JSON_DATA
 get_extension_info() {
-    local ext_identifier="$1"
+  local identifier="$1"
+  local response match_count
 
-    if [[ ! "${ext_identifier}" =~ ^[0-9]+$ ]]; then
-        # Literal-name extension config
-        local whitespace_html="${ext_identifier// /%20}"
-        local url_query_result
-        url_query_result=$(curl -sf "https://extensions.gnome.org/extension-query/?search=${whitespace_html}")
-        EXT_JSON_DATA=$(echo "${url_query_result}" | jq ".extensions[] | select(.name == \"${ext_identifier}\")")
+  if [[ "$identifier" =~ ^[0-9]+$ ]]; then
+    EXT_JSON_DATA="$(fetch "${EXTENSIONS_URL}/extension-info/?pk=${identifier}")" \
+      || die "Could not fetch extension with PK ID '${identifier}'"
 
-        if [[ -z "${EXT_JSON_DATA}" ]] || [[ "${EXT_JSON_DATA}" == "null" ]]; then
-          echo "ERROR: Extension '${ext_identifier}' does not exist in https://extensions.gnome.org/ website"
-          echo "       Extension name is case-sensitive, so be sure that you typed it correctly,"
-          echo "       including the correct uppercase & lowercase characters"
-          exit 1
-        fi
+    jq -e '.pk != null' >/dev/null <<<"$EXT_JSON_DATA" \
+      || die "Extension with PK ID '${identifier}' does not exist"
+  else
+    response="$(
+      fetch --get --data-urlencode "search=${identifier}" \
+        "${EXTENSIONS_URL}/extension-query/"
+    )" || die "Could not search for extension '${identifier}'"
 
-        local -a uuids
-        local -a names
-        readarray -t uuids < <(echo "${EXT_JSON_DATA}" | jq -r '.["uuid"]')
-        readarray -t names < <(echo "${EXT_JSON_DATA}" | jq -r '.["name"]')
+    EXT_JSON_DATA="$(
+      jq -ce --arg name "$identifier" \
+        '[.extensions[] | select(.name == $name)]' <<<"$response"
+    )" || die "The extension search returned invalid data"
 
-        if [[ ${#uuids[@]} -gt 1 ]]; then
-          echo "ERROR: Multiple compatible Gnome extensions with the same name are found, which this module cannot select"
-          echo "       To solve this problem, please use PK ID as a module input entry instead of the extension name"
-          echo "       You can get PK ID from the extension URL, like from Blur my Shell's 3193 PK ID example below:"
-          echo "       https://extensions.gnome.org/extension/3193/blur-my-shell/"
-          exit 1
-        fi
-        EXT_UUID="${uuids[0]}"
-        EXT_NAME="${names[0]}"
-    else
-        # PK ID extension config
-        EXT_JSON_DATA=$(curl -sf "https://extensions.gnome.org/extension-info/?pk=${ext_identifier}")
-        local pk_ext
-        pk_ext=$(echo "${EXT_JSON_DATA}" | jq -r '.["pk"]' 2>/dev/null)
+    match_count="$(jq -r 'length' <<<"$EXT_JSON_DATA")"
+    case "$match_count" in
+      0)
+        die "Extension '${identifier}' does not exist (names are case-sensitive)"
+        ;;
+      1)
+        EXT_JSON_DATA="$(jq -c '.[0]' <<<"$EXT_JSON_DATA")"
+        ;;
+      *)
+        die "Multiple extensions are named '${identifier}'; use the PK ID from the extension URL"
+        ;;
+    esac
+  fi
 
-        if [[ -z "${pk_ext}" ]] || [[ "${pk_ext}" == "null" ]]; then
-          echo "ERROR: Extension with PK ID '${ext_identifier}' does not exist in https://extensions.gnome.org/ website"
-          echo "       Please assure that you typed the PK ID correctly,"
-          echo "       and that it exists in Gnome extensions website"
-          exit 1
-        fi
-
-        EXT_UUID=$(echo "${EXT_JSON_DATA}" | jq -r '.["uuid"]')
-        EXT_NAME=$(echo "${EXT_JSON_DATA}" | jq -r '.["name"]')
-    fi
+  EXT_UUID="$(jq -er '.uuid | select(type == "string" and length > 0)' <<<"$EXT_JSON_DATA")" \
+    || die "Extension '${identifier}' has no valid UUID"
+  EXT_NAME="$(jq -er '.name | select(type == "string" and length > 0)' <<<"$EXT_JSON_DATA")" \
+    || die "Extension '${identifier}' has no valid name"
+  [[ "$EXT_UUID" != */* && "$EXT_UUID" != "." && "$EXT_UUID" != ".." ]] \
+    || die "Extension '${identifier}' returned an unsafe UUID"
 }
 
-# Populates SUITABLE_VERSION
 get_suitable_version() {
-    local json_data="$1"
-    local gnome_ver="$2"
-    local ext_name="$3"
+  local version
+  local shell_version="$GNOME_VERSION"
 
-    SUITABLE_VERSION=$(echo "${json_data}" | jq ".shell_version_map[\"${gnome_ver}\"].version")
-    if [[ -z "${SUITABLE_VERSION}" ]] || [[ "${SUITABLE_VERSION}" == "null" ]]; then
-        local gnome_ver_current=${gnome_ver}
-        echo "Extension '${ext_name}' is not available for GNOME ${gnome_ver_current}, trying to find compatible version for previous releases..."
-        while [[ -z "${SUITABLE_VERSION}" || "${SUITABLE_VERSION}" == "null" ]]; do
-            gnome_ver_current=$((gnome_ver_current - 1))
-            SUITABLE_VERSION=$(echo "${json_data}" | jq ".shell_version_map[\"${gnome_ver_current}\"].version")
-            if [[ ${gnome_ver_current} -lt 40 ]]; then
-                break
-            fi
-        done
+  while (( shell_version >= 40 )); do
+    if version="$(
+      jq -er --arg shell_version "$shell_version" \
+        '.shell_version_map[$shell_version].version // empty' <<<"$EXT_JSON_DATA"
+    )"; then
+      SUITABLE_VERSION="$version"
+      if (( shell_version != GNOME_VERSION )); then
+        echo "Using '${EXT_NAME}' release for GNOME ${shell_version}; no GNOME ${GNOME_VERSION} release is available"
+      fi
+      return
     fi
+    shell_version=$((shell_version - 1))
+  done
 
-    if [[ -z "${SUITABLE_VERSION}" ]] || [[ "${SUITABLE_VERSION}" == "null" ]]; then
-        echo "ERROR: Extension '${ext_name}' is not compatible with Gnome v${gnome_ver} in your image, and no compatible older version was found."
-        exit 1
-    fi
+  die "Extension '${EXT_NAME}' has no release compatible with GNOME ${GNOME_VERSION} or an earlier supported version"
 }
 
-if [[ ${#INSTALL[@]} -gt 0 ]]; then
-  for INSTALL_EXT in "${INSTALL[@]}"; do
-      get_extension_info "${INSTALL_EXT}"
-      get_suitable_version "${EXT_JSON_DATA}" "${GNOME_VER}" "${EXT_NAME}"
-      # Removes every @ symbol from UUID, since extension URL doesn't contain @ symbol
-      URL="https://extensions.gnome.org/extension-data/${EXT_UUID//@/}.v${SUITABLE_VERSION}.shell-extension.zip"
-      TMP_DIR="/tmp/${EXT_UUID}"
-      ARCHIVE=$(basename "${URL}")
-      ARCHIVE_DIR="${TMP_DIR}/${ARCHIVE}"
-      echo "Installing '${EXT_NAME}' Gnome extension with version ${SUITABLE_VERSION}"
-      # Download archive
-      echo "Downloading ZIP archive ${URL}"
-      curl -fLs --create-dirs "${URL}" -o "${ARCHIVE_DIR}"
-      echo "Downloaded ZIP archive ${URL}"
-      # Extract archive
-      echo "Extracting ZIP archive"
-      unzip "${ARCHIVE_DIR}" -d "${TMP_DIR}" > /dev/null
-      # Remove archive
-      echo "Removing archive"
-      rm "${ARCHIVE_DIR}"
-      # Install main extension files
-      echo "Installing main extension files"
-      install -d -m 0755 "/usr/share/gnome-shell/extensions/${EXT_UUID}/"
-      find "${TMP_DIR}" -mindepth 1 -maxdepth 1 ! -path "*locale*" ! -path "*schemas*" -exec cp -r {} "/usr/share/gnome-shell/extensions/${EXT_UUID}/" \;
-      find "/usr/share/gnome-shell/extensions/${EXT_UUID}" -type d -exec chmod 0755 {} +
-      find "/usr/share/gnome-shell/extensions/${EXT_UUID}" -type f -exec chmod 0644 {} +
-      # Install schema
-      if [[ -d "${TMP_DIR}/schemas" ]]; then
-        echo "Installing schema extension file"
-        # Workaround for extensions, which explicitly require compiled schema to be in extension UUID directory (rare scenario due to how extension is programmed in non-standard way)
-        # Error code example:
-        # GLib.FileError: Failed to open file “/usr/share/gnome-shell/extensions/flypie@schneegans.github.com/schemas/gschemas.compiled”: open() failed: No such file or directory
-        # If any extension produces this error, it can be added in if statement below to solve the problem
-        # Fly-Pie or PaperWM
-        if [[ "${EXT_UUID}" == "flypie@schneegans.github.com" || "${EXT_UUID}" == "paperwm@paperwm.github.com" ]]; then
-          install -d -m 0755 "/usr/share/gnome-shell/extensions/${EXT_UUID}/schemas/"
-          install -D -p -m 0644 "${TMP_DIR}/schemas/"*.gschema.xml "/usr/share/gnome-shell/extensions/${EXT_UUID}/schemas/"
-          glib-compile-schemas "/usr/share/gnome-shell/extensions/${EXT_UUID}/schemas/" &>/dev/null
-        else
-          # Regular schema installation
-          install -d -m 0755 "/usr/share/glib-2.0/schemas/"
-          install -D -p -m 0644 "${TMP_DIR}/schemas/"*.gschema.xml "/usr/share/glib-2.0/schemas/"
-        fi
-      fi
-      # Install languages
-      # Locale is not crucial for extensions to work, as they will fallback to gschema.xml
-      # Some of them might not have any locale at the moment
-      # So that's why I made a check for directory
-      # I made an additional check if language files are available, in case if extension is packaged with an empty folder, like with Default Workspace extension
-      if [[ -d "${TMP_DIR}/locale/" ]]; then
-        if find "${TMP_DIR}/locale/" -type f -name "*.mo" -print -quit | read -r; then
-          echo "Installing language extension files"
-          install -d -m 0755 "/usr/share/locale/"
-          cp -r "${TMP_DIR}/locale"/* "/usr/share/locale/"
-        fi
-      fi
-      # Delete the temporary directory
-      echo "Cleaning up the temporary directory"
-      rm -r "${TMP_DIR}"
-      echo "Extension '${EXT_NAME}' is successfully installed"
-      echo "----------------------------------INSTALLATION DONE----------------------------------"
-  done
-fi
+install_schemas() {
+  local source_dir="$1"
+  local extension_dir="$2"
+  local destination
+  local -a schema_files
 
-if [[ ${#UNINSTALL[@]} -gt 0 ]]; then
-  for UNINSTALL_EXT in "${UNINSTALL[@]}"; do
-      get_extension_info "${UNINSTALL_EXT}"
-      # This is where uninstall step goes, above step is reused from install part
-      EXT_FILES="/usr/share/gnome-shell/extensions/${EXT_UUID}"
-      UNINSTALL_METADATA="${EXT_FILES}/metadata.json"
-      GETTEXT_DOMAIN=$(jq -r '.["gettext-domain"]' < "${UNINSTALL_METADATA}")
-      SETTINGS_SCHEMA=$(jq -r '.["settings-schema"]' < "${UNINSTALL_METADATA}")
-      LANGUAGE_LOCATION="/usr/share/locale"
-      # If settings-schema YAML key exists, than use that, if it doesn't
-      # Than substract the schema ID before @ symbol
-      if [[ ! "${SETTINGS_SCHEMA}" == "null" ]]; then
-        SCHEMA_LOCATION="/usr/share/glib-2.0/schemas/${SETTINGS_SCHEMA}.gschema.xml"
-      else
-        SUBSTRACTED_UUID=$(echo "${EXT_UUID}" | cut -d'@' -f1)
-        SCHEMA_LOCATION="/usr/share/glib-2.0/schemas/org.gnome.shell.extensions.${SUBSTRACTED_UUID}.gschema.xml"
-      fi
-      # Remove languages
-      if [[ ! "${GETTEXT_DOMAIN}" == "null" ]]; then
-        find "${LANGUAGE_LOCATION}" -type f -name "${GETTEXT_DOMAIN}.mo" -exec rm {} \;
-      else
-        echo "There are no extension languages to remove, since extension doesn't contain them"
-      fi
-      # Remove gschema xml
-      if [[ ! "${SETTINGS_SCHEMA}" == "null" ]] && [[ -f "${SCHEMA_LOCATION}" ]]; then
-        rm "${SCHEMA_LOCATION}"
-      else
-        echo "There is no gschema xml to remove, since extension doesn't have any settings"
-      fi
-      # Removing main extension files
-      if [[ -d "${EXT_FILES}" ]]; then
-        echo "Removing main extension files"
-        rm -r "${EXT_FILES}"
-      else
-        echo "ERROR: There are no main extension files to remove from the base image"
-        echo "       It is possible that the extension that you inputted is not actually installed"
-        exit 1
-      fi
-      echo "----------------------------------UNINSTALLATION DONE----------------------------------"
-  done
-fi
+  shopt -s nullglob
+  schema_files=("${source_dir}/schemas/"*.gschema.xml)
+  shopt -u nullglob
+  (( ${#schema_files[@]} > 0 )) || return
 
-# Compile gschema to include schemas from extensions & to refresh schema state after uninstall is done
-echo "Compiling gschema to include extension schemas & to refresh the schema state"
-glib-compile-schemas "/usr/share/glib-2.0/schemas/" &>/dev/null
+  echo "Installing extension schemas"
+  case "$EXT_UUID" in
+    flypie@schneegans.github.com|paperwm@paperwm.github.com)
+      destination="${extension_dir}/schemas"
+      install -d -m 0755 "$destination"
+      install -p -m 0644 "${schema_files[@]}" "$destination/"
+      glib-compile-schemas "$destination" >/dev/null
+      ;;
+    *)
+      install -d -m 0755 "$SCHEMAS_DIR"
+      install -p -m 0644 "${schema_files[@]}" "$SCHEMAS_DIR/"
+      ;;
+  esac
+}
+
+install_locales() {
+  local source_dir="$1"
+  local locale_file
+
+  [[ -d "${source_dir}/locale" ]] || return
+  locale_file="$(find "${source_dir}/locale" -type f -name '*.mo' -print -quit)"
+  [[ -n "$locale_file" ]] || return
+
+  echo "Installing extension locales"
+  install -d -m 0755 "$LOCALES_DIR"
+  cp -a "${source_dir}/locale/." "$LOCALES_DIR/"
+}
+
+install_extension() {
+  local identifier="$1"
+  local archive source_dir extension_dir url work_dir
+
+  get_extension_info "$identifier"
+  get_suitable_version
+
+  work_dir="$(mktemp -d "${TMP_DIR}/extension.XXXXXX")"
+  archive="${work_dir}/extension.zip"
+  source_dir="${work_dir}/source"
+  extension_dir="${EXTENSIONS_DIR}/${EXT_UUID}"
+  url="${EXTENSIONS_URL}/extension-data/${EXT_UUID//@/}.v${SUITABLE_VERSION}.shell-extension.zip"
+
+  echo "Installing '${EXT_NAME}' version ${SUITABLE_VERSION}"
+  fetch "$url" --output "$archive"
+  install -d -m 0755 "$source_dir"
+  unzip -q "$archive" -d "$source_dir"
+
+  rm -rf "$extension_dir"
+  install -d -m 0755 "$extension_dir"
+  find "$source_dir" -mindepth 1 -maxdepth 1 \
+    ! -name locale ! -name schemas \
+    -exec cp -a -- {} "$extension_dir/" \;
+  find "$extension_dir" -type d -exec chmod 0755 {} +
+  find "$extension_dir" -type f -exec chmod 0644 {} +
+
+  install_schemas "$source_dir" "$extension_dir"
+  install_locales "$source_dir"
+
+  echo "Extension '${EXT_NAME}' installed successfully"
+}
+
+uninstall_extension() {
+  local identifier="$1"
+  local extension_dir metadata gettext_domain settings_schema schema_location
+
+  get_extension_info "$identifier"
+  extension_dir="${EXTENSIONS_DIR}/${EXT_UUID}"
+  metadata="${extension_dir}/metadata.json"
+
+  [[ -d "$extension_dir" ]] \
+    || die "Extension '${EXT_NAME}' is not installed in the base image"
+  [[ -f "$metadata" ]] \
+    || die "Installed extension '${EXT_NAME}' has no metadata.json"
+
+  gettext_domain="$(jq -er '."gettext-domain" // ""' "$metadata")"
+  settings_schema="$(jq -er '."settings-schema" // ""' "$metadata")"
+
+  if [[ -n "$gettext_domain" ]]; then
+    find "$LOCALES_DIR" -type f -name "${gettext_domain}.mo" -delete
+  fi
+
+  if [[ -n "$settings_schema" ]]; then
+    [[ "$settings_schema" != */* ]] \
+      || die "Installed extension '${EXT_NAME}' has an unsafe settings schema"
+    schema_location="${SCHEMAS_DIR}/${settings_schema}.gschema.xml"
+  else
+    schema_location="${SCHEMAS_DIR}/org.gnome.shell.extensions.${EXT_UUID%%@*}.gschema.xml"
+  fi
+  rm -f "$schema_location"
+
+  rm -rf "$extension_dir"
+  echo "Extension '${EXT_NAME}' uninstalled successfully"
+}
+
+for extension in "${INSTALL[@]}"; do
+  install_extension "$extension"
+done
+
+for extension in "${UNINSTALL[@]}"; do
+  uninstall_extension "$extension"
+done
+
+echo "Compiling extension schemas"
+glib-compile-schemas "$SCHEMAS_DIR" >/dev/null

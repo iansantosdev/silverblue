@@ -1,0 +1,65 @@
+#!/usr/bin/bash
+
+set -euo pipefail
+
+firefox_stopped() {
+  local applications
+
+  if ! applications=$(/usr/bin/flatpak ps --columns=application); then
+    echo "Unable to determine whether Firefox is running." >&2
+    return 255
+  fi
+
+  while IFS= read -r application; do
+    if [[ "$application" == "org.mozilla.firefox" ]]; then
+      return 1
+    fi
+  done <<<"$applications"
+}
+
+network_unmetered() {
+  local property_type
+  local metered
+
+  if ! read -r property_type metered < <(
+    /usr/bin/busctl get-property \
+      org.freedesktop.NetworkManager \
+      /org/freedesktop/NetworkManager \
+      org.freedesktop.NetworkManager \
+      Metered
+  ); then
+    echo "Unable to read NetworkManager's metered state." >&2
+    return 255
+  fi
+
+  if [[ "$property_type" != "u" ]]; then
+    echo "Unexpected NetworkManager metered property type: $property_type" >&2
+    return 255
+  fi
+
+  case "$metered" in
+    2 | 4)
+      return 0
+      ;;
+    0 | 1 | 3)
+      return 1
+      ;;
+    *)
+      echo "Unexpected NetworkManager metered state: $metered" >&2
+      return 255
+      ;;
+  esac
+}
+
+case "${1:-}" in
+  firefox-stopped)
+    firefox_stopped
+    ;;
+  network-unmetered)
+    network_unmetered
+    ;;
+  *)
+    echo "Usage: $0 {firefox-stopped|network-unmetered}" >&2
+    exit 2
+    ;;
+esac

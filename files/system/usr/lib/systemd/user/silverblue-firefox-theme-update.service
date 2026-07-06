@@ -1,0 +1,20 @@
+[Unit]
+Description=Update the Firefox GNOME theme
+Documentation=https://github.com/rafaelmardojai/firefox-gnome-theme
+Wants=podman-user-wait-network-online.service
+After=podman-user-wait-network-online.service
+StartLimitIntervalSec=30min
+StartLimitBurst=3
+
+[Service]
+Type=oneshot
+ExecCondition=/usr/libexec/silverblue/maintenance-condition firefox-stopped
+ExecStart=/usr/libexec/silverblue/firefox-theme-update
+Restart=on-failure
+RestartSec=30s
+TimeoutStartSec=15min
+Nice=10
+IOSchedulingClass=idle
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full

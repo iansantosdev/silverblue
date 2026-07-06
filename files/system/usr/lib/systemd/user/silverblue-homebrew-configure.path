@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch for the Homebrew installation marker
+
+[Path]
+PathExists=/etc/.linuxbrew
+Unit=silverblue-homebrew-configure.service
+
+[Install]
+WantedBy=graphical-session.target

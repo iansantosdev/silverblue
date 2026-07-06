@@ -1,0 +1,100 @@
+[Flatpak Preinstall app.drey.Damask]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall com.bitwarden.desktop]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall com.github.tchx84.Flatseal]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall com.mattjakeman.ExtensionManager]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall com.spotify.Client]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall io.bassi.Amberol]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall io.mpv.Mpv]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall md.obsidian.Obsidian]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall net.nokyan.Resources]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall org.gnome.Calculator]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall org.gnome.Calendar]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall org.gnome.clocks]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall org.gnome.Contacts]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall org.gnome.Loupe]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall org.gnome.NautilusPreviewer]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall org.gnome.Papers]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall org.gnome.Snapshot]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall org.gnome.TextEditor]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall org.gnome.Weather]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall org.localsend.localsend_app]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall org.mozilla.firefox]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall org.mozilla.thunderbird]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall org.qbittorrent.qBittorrent]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall org.signal.Signal]
+Branch=stable
+CollectionID=org.flathub.Stable
+
+[Flatpak Preinstall org.gtk.Gtk3theme.Adwaita-dark]
+Branch=3.22
+CollectionID=org.flathub.Stable
+IsRuntime=true

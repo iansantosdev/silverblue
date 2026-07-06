@@ -2,8 +2,15 @@
 
 set -oue pipefail
 
-FILE=/usr/share/gnome-shell/extensions/sp-tray@sp-tray.esenliyim.github.com/metadata.json
-jq '.["shell-version"] += ["50"]' $FILE > tmp && mv tmp $FILE
+update_shell_version() {
+  local file="$1"
+  local tmp
+  tmp="$(mktemp)"
 
-FILE=/usr/share/gnome-shell/extensions/clipboard-history@alexsaveau.dev/metadata.json
-jq '.["shell-version"] += ["50"]' $FILE > tmp && mv tmp $FILE
+  jq '(.["shell-version"] // []) += ["50"] | .["shell-version"] |= unique' "$file" > "$tmp"
+  chown --reference="$file" "$tmp"
+  chmod --reference="$file" "$tmp"
+  mv "$tmp" "$file"
+}
+
+update_shell_version /usr/share/gnome-shell/extensions/clipboard-history@alexsaveau.dev/metadata.json

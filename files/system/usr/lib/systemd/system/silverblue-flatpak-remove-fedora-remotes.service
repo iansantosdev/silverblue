@@ -1,0 +1,31 @@
+[Unit]
+Description=Remove Fedora Flatpak remotes
+Documentation=man:flatpak-remote-delete(1)
+After=local-fs.target
+Before=flatpak-system-helper.service
+
+[Service]
+Type=oneshot
+ExecStart=-/usr/bin/flatpak remote-delete --system --force fedora
+ExecStart=-/usr/bin/flatpak remote-delete --system --force fedora-testing
+ExecStart=/usr/bin/touch /var/lib/flatpak/.fedora-initialized
+RemainAfterExit=true
+TimeoutStartSec=10min
+StateDirectory=flatpak
+StateDirectoryMode=0755
+LockPersonality=true
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectHome=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+RestrictRealtime=true
+RestrictSUIDSGID=true
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target

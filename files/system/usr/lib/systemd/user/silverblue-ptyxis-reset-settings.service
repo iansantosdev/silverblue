@@ -1,0 +1,21 @@
+[Unit]
+Description=Reset Ptyxis settings once
+ConditionPathExists=!%S/silverblue/ptyxis-reset-settings-done
+ConditionPathExists=!%E/ptyxis-reset-settings-done
+StartLimitIntervalSec=30min
+StartLimitBurst=3
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/silverblue/ptyxis-reset-settings
+Restart=on-failure
+RestartSec=30s
+TimeoutStartSec=1min
+StateDirectory=silverblue
+StateDirectoryMode=0700
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=graphical-session.target

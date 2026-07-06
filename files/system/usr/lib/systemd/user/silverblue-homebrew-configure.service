@@ -1,0 +1,21 @@
+[Unit]
+Description=Configure Homebrew
+Documentation=https://docs.brew.sh/Brew-Bundle-and-Brewfile
+Wants=podman-user-wait-network-online.service
+After=podman-user-wait-network-online.service
+ConditionPathExists=/etc/.linuxbrew
+StartLimitIntervalSec=30min
+StartLimitBurst=3
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/silverblue/homebrew-configure
+RemainAfterExit=true
+Restart=on-failure
+RestartSec=30s
+TimeoutStartSec=1h
+Nice=10
+IOSchedulingClass=idle
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full

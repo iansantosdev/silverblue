@@ -1,0 +1,22 @@
+[Unit]
+Description=Update user Flatpaks
+Documentation=man:flatpak(1)
+Wants=podman-user-wait-network-online.service silverblue-flatpak-user-preinstall.service
+After=podman-user-wait-network-online.service silverblue-flatpak-user-preinstall.service
+StartLimitIntervalSec=30min
+StartLimitBurst=3
+
+[Service]
+Type=oneshot
+ExecCondition=/usr/libexec/silverblue/maintenance-condition network-unmetered
+ExecStart=/usr/bin/flatpak --user update --assumeyes --noninteractive
+ExecStart=/usr/bin/flatpak --user uninstall --unused --assumeyes --noninteractive
+ExecStart=/usr/bin/flatpak --user repair
+Restart=on-failure
+RestartSec=30s
+TimeoutStartSec=1h
+Nice=10
+IOSchedulingClass=idle
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full

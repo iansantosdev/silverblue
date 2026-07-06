@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+
+set -euo pipefail
+
+if [[ -z "${STATE_DIRECTORY:-}" ]]; then
+  echo "STATE_DIRECTORY is not set." >&2
+  exit 1
+fi
+
+/usr/bin/dconf reset -f /org/gnome/Ptyxis/
+/usr/bin/touch "$STATE_DIRECTORY/ptyxis-reset-settings-done"

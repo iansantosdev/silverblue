@@ -1,0 +1,12 @@
+[Unit]
+Description=Update Arkenfox user.js daily
+Documentation=https://github.com/arkenfox/user.js
+
+[Timer]
+OnCalendar=*-*-* 03:00:00 UTC
+Persistent=true
+RandomizedOffsetSec=30min
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target

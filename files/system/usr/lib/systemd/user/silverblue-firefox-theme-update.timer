@@ -1,0 +1,12 @@
+[Unit]
+Description=Update the Firefox GNOME theme daily
+Documentation=https://github.com/rafaelmardojai/firefox-gnome-theme
+
+[Timer]
+OnCalendar=*-*-* 03:00:00 UTC
+Persistent=true
+RandomizedOffsetSec=30min
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target

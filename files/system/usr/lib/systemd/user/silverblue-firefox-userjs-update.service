@@ -1,0 +1,20 @@
+[Unit]
+Description=Update Arkenfox user.js
+Documentation=https://github.com/arkenfox/user.js
+Wants=podman-user-wait-network-online.service
+After=podman-user-wait-network-online.service
+StartLimitIntervalSec=30min
+StartLimitBurst=3
+
+[Service]
+Type=oneshot
+ExecCondition=/usr/libexec/silverblue/maintenance-condition firefox-stopped
+ExecStart=/usr/libexec/silverblue/firefox-userjs-update
+Restart=on-failure
+RestartSec=30s
+TimeoutStartSec=15min
+Nice=10
+IOSchedulingClass=idle
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full

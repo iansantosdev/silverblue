@@ -60,36 +60,6 @@ modules:
     auto-upgrade: true
     brew-analytics: false
 
-  - type: default-flatpaks
-    configurations:
-      - notify: false
-        install:
-          - app.drey.Damask
-          - com.bitwarden.desktop
-          - com.github.tchx84.Flatseal
-          - com.mattjakeman.ExtensionManager
-          - com.spotify.Client
-          - io.bassi.Amberol
-          - io.mpv.Mpv
-          - md.obsidian.Obsidian
-          - net.nokyan.Resources
-          - org.gnome.Calculator
-          - org.gnome.Calendar
-          - org.gnome.clocks
-          - org.gnome.Contacts
-          - org.gnome.Loupe
-          - org.gnome.NautilusPreviewer
-          - org.gnome.Papers
-          - org.gnome.Snapshot
-          - org.gnome.TextEditor
-          - org.gnome.Weather
-          - org.localsend.localsend_app
-          - org.mozilla.firefox
-          - org.mozilla.Thunderbird
-          - org.qbittorrent.qBittorrent
-          - org.signal.Signal
-          - org.gtk.Gtk3theme.Adwaita-dark
-
   - type: gnome-extensions
     source: local
     install:
@@ -97,7 +67,6 @@ modules:
       - Clipboard History
       - Hot Edge
       - Just Perfection
-      - spotify-tray
       - Weather O'Clock
 
   - type: gschema-overrides
@@ -110,21 +79,25 @@ modules:
   - type: systemd
     system:
       enabled:
-        - autologin.service
         - rpm-ostreed-automatic.timer
+        - silverblue-autologin.path
+        - silverblue-autologin.service
+        - silverblue-flatpak-remove-fedora-remotes.service
         - tailscaled.service
       masked:
+        - flatpak-add-fedora-repos.service
         - rpm-ostree-countme.service
         - rpm-ostree-countme.timer
     user:
       enabled:
-        - homebrew-configure.service
-        - firefox-theme-update.timer
-        - firefox-userjs-update.timer
-        - flatpak-user-update.timer
         - podman-auto-update.timer
         - podman.socket
-        - ptyxis-reset-settings.service
+        - silverblue-firefox-theme-update.timer
+        - silverblue-firefox-userjs-update.timer
+        - silverblue-flatpak-user-preinstall.service
+        - silverblue-flatpak-user-update.timer
+        - silverblue-homebrew-configure.path
+        - silverblue-ptyxis-reset-settings.service
 
   - type: bling
     install:
@@ -138,6 +111,7 @@ modules:
   - type: script
     scripts:
       - set-file-permissions.sh
+      - install-spotify-flatpak-panel.sh
       - fix-extension-version.sh
       - remove-brew-completions.sh
 

@@ -1,0 +1,25 @@
+[Unit]
+Description=Install Flatpaks declared by the operating system
+Documentation=man:flatpak-preinstall(1)
+Wants=podman-user-wait-network-online.service
+After=podman-user-wait-network-online.service
+StartLimitIntervalSec=30min
+StartLimitBurst=3
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/flatpak --user remote-add --if-not-exists --from flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+ExecStart=/usr/bin/flatpak --user remote-modify --collection-id=org.flathub.Stable flathub
+ExecStart=/usr/bin/flatpak preinstall --user --assumeyes --noninteractive
+RemainAfterExit=true
+Restart=on-failure
+RestartSec=30s
+TimeoutStartSec=1h
+Nice=10
+IOSchedulingClass=idle
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=default.target
