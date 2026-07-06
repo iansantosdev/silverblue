@@ -22,37 +22,37 @@ jobs:
   validate:
     name: validate
     runs-on: ubuntu-latest
-    container: fedora:44
     permissions:
       contents: read
     steps:
-      - name: Install validation dependencies
-        run: |
-          dnf install -y dconf flatpak git glib2 podman shellcheck systemd
-
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Install BlueBuild
+      - name: Build validation image
         run: |
-          cleanup() {
-            podman --storage-driver=vfs rm -f blue-build-installer >/dev/null 2>&1 || true
-          }
-          trap cleanup EXIT
-          podman --storage-driver=vfs create \
+          podman build \
             --pull=always \
-            --name blue-build-installer \
-            ghcr.io/blue-build/cli:latest-installer
-          podman --storage-driver=vfs cp \
-            blue-build-installer:/out/bluebuild \
-            /usr/local/bin/bluebuild
-          bluebuild --version
+            --tag localhost/silverblue-validation:ci \
+            --file .github/validation.Containerfile \
+            .
 
       - name: Validate repository
-        run: ./scripts/validate.sh
+        run: |
+          podman run --rm \
+            --userns=keep-id \
+            --volume "$GITHUB_WORKSPACE:/workspace:ro" \
+            --workdir /workspace \
+            localhost/silverblue-validation:ci \
+            ./scripts/validate.sh
 
       - name: Validate Flatpak references
-        run: ./scripts/validate-flatpaks.sh
+        run: |
+          podman run --rm \
+            --userns=keep-id \
+            --volume "$GITHUB_WORKSPACE:/workspace:ro" \
+            --workdir /workspace \
+            localhost/silverblue-validation:ci \
+            ./scripts/validate-flatpaks.sh
 
   silverblue:
     name: silverblue
